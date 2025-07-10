@@ -1,0 +1,264 @@
+# YAML File for ADIS1647x with ADRD2121
+
+# If any parameter is not defined (i.e. commented), the default value will be used. 
+/**:
+  ros__parameters:
+    ### ROS SPECIFIC PARAMETERS ###
+
+    ## ROS Topic name
+    ## Default: imu/data_raw
+    topic_name: "imu/data_raw"
+
+    ## ROS Frame name
+    ## Default: imu
+    frame_name: "imu"
+
+    ## Message Type of Topic
+    ## 1 - sensor_msgs/Imu (DEFAULT)
+    ## 2 - AdiImu
+    msg_type: 1
+
+    ## Mode of operation:
+    ## 1: STREAM
+    ## 2: RECOVERY
+    mode_of_operation: 1
+
+    ### Communication Interface parameters ###
+    ## Host <-> ADRD2121 via USB
+
+    ## USB/UART Parameters
+    usb_dev: "/dev/ttyACM0"
+    usb_baud: 921600
+
+    ##### ADRD2121 SPECIFIC PARAMETERS #####
+
+    # Burst Count is a parameter that allows multiple transactions in a single syscall
+    # i.e. In a single syscall, multiple data can be retrieved from the Buffer
+    # Default Value : 1
+    # Recommended Value: 1-4 [TODO: Optimize based on actual Buffer Board UTC]
+    buf_burst_count: 1
+
+    ### Configure BUF_CONFIG Register ###
+    ## Enables IMU Burst data capture for buffer entries (IMU <-> ADRD2121 SPI port)
+    enable_imu_burst: true
+
+    ## Buffer overflow behavior
+    ## 0 - stop sampling
+    ## 1 - replace oldest data
+    buf_overflow: 0
+
+    ## Trigger PPS_ENABLE in USER_CMD
+    ## true - enabled
+    ## false - disabled
+    ## NOTE: This can be used if an external PPS input is connected 
+    ## to pins BUF_DIO1/BUF_DIO2/BUF_DIO3/BUF_DIO4
+    enable_buf_pps: false
+
+    ### Setting DIO_INPUT_CONFIG of ADRD2121 ###
+    
+    ## Select which IMU DIO output pin is treated as data ready
+    ## 1 : BUF_DIO1
+    ## 2 : BUF_DIO2
+    ## 4 : BUF_DIO3
+    ## 8 : BUF_DIO4
+    ## For ADIS16470, only BUF_DIO1 is possible
+    buf_data_rdy_sel: 1
+
+    ## Data ready trigger polarity 
+    ## 0 - triggers on falling edge
+    ## 1 - triggers on rising edge
+    buf_data_rdy_pol: 1
+    
+    ## Select which host processor DIO output pin acts as a Pulse Per Second (PPS) input
+    ## 0 - Disabled
+    ## 1 : BUF_DIO1
+    ## 2 : BUF_DIO2
+    ## 4 : BUF_DIO3
+    ## 8 : BUF_DIO4
+    buf_pps_sel: 0
+    
+    ## PPS trigger polarity 
+    ## 0 - triggers on falling edge
+    ## 1 - triggers on rising edge
+    buf_pps_pol: 0
+
+    ## PPS Frequency
+    ## Possible values: 0-3; wherein PPS Input Frequency is (10 ^ (buf_pps-freq) Hz)
+    buf_pps_freq: 0
+
+    ## Set to true if recovery will be done automatically
+    enable_init_recovery: true
+
+    ## Timeout duration for buffer clearing (in milliseconds)
+    ## Allowed range is 500-3000 ms
+    clear_buffer_timeout: 3000
+
+    ### Setting DIO_OUTPUT_CONFIG of ADRD2121 ###
+
+    ## Possible values in buf_pin_pass, buf_watermark_int, buf_overflow_int, and buf_error_int
+    ## 1 : BUF_DIO1
+    ## 2 : BUF_DIO2
+    ## 4 : BUF_DIO3
+    ## 8 : BUF_DIO4
+    buf_pin_pass: 0
+    buf_watermark_int: 0
+    buf_overflow_int: 0
+    buf_error_int: 0
+
+    ##### IMU SPECIFIC PARAMETERS #####
+    
+    ## Product ID
+    imu_prod_id: 16470
+
+    ## Gravity constant; if 1.0, accelerometer output is normalized to g
+    gravity: 9.81
+
+    ## IMU Data Format
+    ## 0 - 16-bit
+    ## 1 - 32-bit (default)
+    ## For ADIS16470, for Burst Read, data format is fixed to 16-bit
+    imu_data_format: 0
+
+    ## Data Rate in Hz (in DEC_RATE Register)   
+    imu_data_rate: 100
+
+    ## Data ready line selection
+    ## Values based on adi_imu_GPIO_e
+    ## 0 : IMU_DIO1
+    ## 1 : IMU_DIO2
+    ## 2 : IMU_DIO3
+    ## 3 : IMU_DIO4
+    ## For ADIS16470, this is NOT USED. Data Ready Line is fixed to Pin 13
+    #imu_data_rdy_line: 0
+
+    ## Data ready polarity (in MSC_CTRL Register)
+    ## Values based on adi_imu_Polarity_e
+    ## 0 : IMU_NEG_POLARITY
+    ## 1 : IMU_POS_POLARITY
+    imu_data_rdy_pol: 1
+
+    ## Sync clock input enable
+    ## Set as true to update the imu_sync_clk_mode and imu_sync_clk_pol
+    enable_imu_sync_clk: false
+
+    ## SYNC Function setting (in MSC_CTRL Register)
+    ## Values based on adi_imu_SyncMode_e
+    ## 0 - IMU_INTERNAL_CLOCK
+    ## 1 - IMU_DIRECT_SYNC
+    ## 2 - IMU_SCALED_SYNC
+    ## 3 - IMU_OUTPUT_SYNC
+    ## If not set or if (enable_imu_sync_clk = false), default is 0 : IMU_INTERNAL_CLOCK
+    imu_sync_clk_mode: 0
+
+    ## Sync clock input line selection
+    ## Values based on adi_imu_GPIO_e
+    ## 0 : IMU_DIO1
+    ## 1 : IMU_DIO2
+    ## 2 : IMU_DIO3
+    ## 3 : IMU_DIO4
+    ## For ADIS16470, this is NOT USED. SYNC Line s fixed to Pin 14
+    #imu_sync_clk_line: 1
+
+    ## Sync clock input polarity (in MSC_CTRL Register)
+    ## Values based on adi_imu_Polarity_e
+    ## 0 : IMU_NEG_POLARITY
+    ## 1 : IMU_POS_POLARITY
+    imu_sync_clk_pol: 1
+
+    ## Linear g compensation for gyroscopes (in MSC_CTRL Register)
+    ## If not set, default value is true
+    ## true - enabled
+    ## false - disabled
+    enable_imu_lin_g_comp: false
+    
+    ## Point of Percussion alignment (in MSC_CTRL Register)
+    ## If not set, default value is true
+    ## true - enabled
+    ## false - disabled
+    enable_imu_pp_align: false
+
+    ### Setting NULL_CNFG Register of IMU ###
+
+    ## Trigger Bias Correction Update in GLOB_CMD Register
+    ## If true, values will be based on the succeeding parameters
+    update_imu_bias_corr: false
+
+    ## Possible values: 0-12
+    ## Will only be updated if update_imu_bias_corr is true, else, default value is 10
+    imu_time_base_control: 10
+    
+    ## Z-axis acceleration bias correction enable
+    ## Will only be updated if update_imu_bias_corr is true, else, default value is disabled 
+    ## 1 - enable
+    ## 0 - disable
+    enable_imu_accl_z_bias_null: 0
+
+    ## Y-axis acceleration bias correction enable
+    ## Will only be updated if update_imu_bias_corr is true, else, default value is disabled 
+    ## 1 - enable
+    ## 0 - disable
+    enable_imu_accl_y_bias_null: 0
+
+    ## X-axis acceleration bias correction enable
+    ## Will only be updated if update_imu_bias_corr is true, else, default value is disabled 
+    ## 1 - enable
+    ## 0 - disable
+    enable_imu_accl_x_bias_null: 0
+
+    ## Z-axis gyroscope bias correction enable
+    ## Will only be updated if update_imu_bias_corr is true, else, default value is enabled 
+    ## 1 - enable
+    ## 0 - disable
+    enable_imu_gyro_z_bias_null: 1
+
+    ## Y-axis gyroscope bias correction enable
+    ## Will only be updated if update_imu_bias_corr is true, else, default value is enabled 
+    ## 1 - enable
+    ## 0 - disable
+    enable_imu_gyro_y_bias_null: 1
+
+    ## X-axis gyroscope bias correction enable
+    ## Will only be updated if update_imu_bias_corr is true, else, default value is enabled 
+    ## 1 - enable
+    ## 0 - disable
+    enable_imu_gyro_x_bias_null: 1
+
+    ### Set Accelerometer/Gyroscope Bias of IMU ###
+
+    ## Set Accelerometer bias
+    ## If true, input is based from imu_accl_bias, else, default accelerometer bias is [0,0,0]
+    update_imu_accl_bias: false
+
+    ## Accelerometer bias values
+    ## [Accl Bias X, Accl Bias Y, Accl Bias Z] where each input is 32-bit
+    imu_accl_bias: [0,0,0]
+
+    ## Set Gyroscope bias
+    ## If true, input is based from imu_gyro_bias, else, default gyroscope bias is [0,0,0]
+    update_imu_gyro_bias: false
+
+    ## Gyroscope bias values
+    ## [Gyro Bias X, Gyro Bias Y, Gyro Bias Z] where each input is 32-bit
+    imu_gyro_bias: [0,0,0]
+
+    ### Set Accelerometer/Gyroscope Scale of IMU ###
+
+    ## Set Accelerometer scale 
+    ## If true, input is based from imu_accl_scale, else, default accelerometer scale is [0,0,0]
+    ## For ADIS16470, this is NOT USED
+    #update_imu_accl_scale: false
+
+    ## Accelerometer scale values
+    ## [Accl Scale X, Accl Scale Y, Accl Scale Z] where each input is 16-bit
+    ## For ADIS16470, this is NOT USED
+    #imu_accl_scale: [0,0,0]
+
+    ## Set Gyroscope scale
+    ## If true, input is based from imu_gyro_bias, else, default gyroscope bias is [0,0,0]
+    ## For ADIS16470, this is NOT USED
+    #update_imu_gyro_scale: false
+
+    ## Gyroscope scale values
+    ## [Gyro Scale X, Gyro Scale Y, Gyro Scale Z] where each input is 16-bit
+    ## For ADIS16470, this is NOT USED
+    #imu_gyro_scale: [0,0,0]
