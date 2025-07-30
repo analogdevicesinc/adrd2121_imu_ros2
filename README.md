@@ -2,12 +2,16 @@
 
 # Background
 - This ROS2 package is an implementation of the prior ROS1 driver, now adapted for ROS2.
-- The ADRD2121 is a hardware and software solution designed to buffer IMU data. (For more info, see: [ADRD2121 Github (TODO)])
+- The ADRD2121 is a hardware and software solution designed to buffer IMU data. (For more info, see: [EVAL-ADRD2121-EBZ Evaluation board](https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/eval-adrd2121-ebz.html))
 - A C-based library is used as a dependency: [adi_imu_driver Github]
-- Supported IMUs are: ADIS16470, ADIS16500
+- Supported IMUs are: [ADIS16470](https://www.analog.com/en/products/adis16470.html), [ADIS16500](https://www.analog.com/en/products/adis16500.html)
 - Enable user to recover board either automatically or manually through functions and services. 
 - Supported communication interface for **Host <-> ADRD2121** are: USB.
 - Supported platform/s are: x86
+- Supported ROS2 Distro: Humble
+
+## Software Architecture
+![Software Architecture Diagram](./docs/images/adrd2121_imu_ros2_Software_Architecture_Diagram.jpg)
 
 # Software Setup
 
@@ -260,7 +264,7 @@ OnProcessStart(
   - This should remove all the FAULT status in the ADRD2121
 + **/flash_update** (std_srvs/Trigger)
   - This will save the current configuration of the Buffer Board to the flash memory, which will be loaded in the next boot-up. 
-+ **/check_status** (std_srvs/Trigger)
++ **/get_buffer_status** (adrd2121_imu/BufStatus)
   - This is meant for acquiring the current status of the Buffer Board. 
   - Status codes and their implications can be found in the ADRD2121 Github's register definitions (see STATUS).
 
@@ -283,9 +287,9 @@ OnProcessStart(
 + **mode_of_operation** (int, default: 0)
   - This is used to check what operation mode the node will run in.
     + "1" : _**STREAM**_ - this will enable all functions related to data streaming.
-      + Services available: **trigger_imu_glob_cmd** and **check_status** 
+      + Services available: **trigger_imu_glob_cmd** and **get_buffer_status** 
     + "2" : _**RECOVERY**_ - data streaming is disabled here. This is meant for clearing error codes. 
-      + Services available: **factory_reset**, **clear_fault**, **flash_update**, and **check_status** 
+      + Services available: **factory_reset**, **clear_fault**, **flash_update**, and **get_buffer_status** 
       + This will skip any initializations for both IMU and the Buffer Board, but UART communication must be established. 
 
 #### Communication Interface Parameters
